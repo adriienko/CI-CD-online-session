@@ -10,6 +10,6 @@ def customImage = docker.build("${registry}:${env.BUILD_ID}")'''
 
   }
   environment {
-    registry = 'markony/flusk-app'
+    registry = 'bogdanandriienko / cicd_worksop'
   }
 }

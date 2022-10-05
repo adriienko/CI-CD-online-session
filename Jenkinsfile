@@ -10,6 +10,6 @@ def customImage = docker.build("${registry}:${env.BUILD_ID}")'''
 
   }
   environment {
-    registry = 'bogdanandriienko / cicd_worksop'
+    registry = 'bogdanandriienko/cicd_worksop'
   }
 }

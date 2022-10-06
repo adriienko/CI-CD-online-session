@@ -1,6 +1,7 @@
 pipeline {
   agent any
   stages {
+    
     stage('Build') {
       steps {
         script {
@@ -10,26 +11,25 @@ pipeline {
 
       }
     }
-stage('unit-test') {
+    
+    stage('unit-test') {
       steps {
         script {
           docker.image("${registry}:${env.BUILD_ID}").inside {c ->
           sh 'python app_test.py'
-        }
-      }
-
-    }
-  }
-stage('http-test') {
+                    }
+               }
+             }
+           }
+   stage('http-test') {
     steps {
       script {
         docker.image("${registry}:${env.BUILD_ID}").withRun('-p 9005:9000') {c ->
         sh "sleep 5; curl -i http://localhost:9005/test_string"
-      }
-    }
-
-  }
-}
+                       }
+             }
+          }
+        }
 
     stage('Publish') {
       steps {
@@ -40,7 +40,6 @@ stage('http-test') {
             docker.image("${registry}:${env.BUILD_ID}").push("${env.BUILD_ID}")
           }
         }
-
       }
     }
     
@@ -58,8 +57,6 @@ stage('http-test') {
 
     
   }
-
-
 
   
   environment {

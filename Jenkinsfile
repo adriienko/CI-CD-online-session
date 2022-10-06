@@ -1,7 +1,6 @@
 pipeline {
   agent any
   stages {
-    
     stage('Build') {
       steps {
         script {
@@ -11,55 +10,55 @@ pipeline {
 
       }
     }
-    
+
     stage('unit-test') {
       steps {
         script {
           docker.image("${registry}:${env.BUILD_ID}").inside {c ->
           sh 'python app_test.py'
-                    }
-               }
-             }
-           }
-   stage('http-test') {
+        }
+      }
+
+    }
+  }
+
+  stage('http-test') {
     steps {
       script {
         docker.image("${registry}:${env.BUILD_ID}").withRun('-p 9005:9000') {c ->
         sh "sleep 5; curl -i http://localhost:9005/test_string"
-                       }
-             }
-          }
-        }
-
-    stage('Publish') {
-      steps {
-        script {
-          docker.withRegistry('', 'dockerhub-id')
-          {
-            docker.image("${registry}:${env.BUILD_ID}").push('latest')
-            docker.image("${registry}:${env.BUILD_ID}").push("${env.BUILD_ID}")
-          }
-        }
       }
     }
-    
-    stage('Deploy') {
-     steps {
-      sh 'docker stop flask-app || true; docker rm flask-app || true;docker run -d --name flask-app -p 9000:9000 bogdanandriienko/cicd_worksop:latest'
-     }
-    }    
-    
-    stage('Validation') {
-     steps {
-      sh 'curl -i http://localhost:9000/test_string'
-     }
+
+  }
+}
+
+stage('Publish') {
+  steps {
+    script {
+      docker.withRegistry('', 'dockerhub-id') {
+        docker.image("${registry}:${env.BUILD_ID}").push('latest')
+        docker.image("${registry}:${env.BUILD_ID}").push("${env.BUILD_ID}")
+      }
     }
 
-    
   }
+}
 
-  
-  environment {
-    registry = 'bogdanandriienko/cicd_worksop'
+stage('Deploy') {
+  steps {
+    sh 'docker stop flask-app || true; docker rm flask-app || true;docker run -d --name flask-app -p 9000:9000 bogdanandriienko/cicd_worksop:latest'
   }
+}
+
+stage('Validation') {
+  steps {
+    sh 'curl -i http://localhost:9000/test_string'
+  }
+}
+
+}
+environment {
+registry = 'bogdanandriienko/cicd_worksop'
+}
 }
